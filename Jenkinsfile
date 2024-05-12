@@ -1,62 +1,55 @@
 pipeline {
     agent any
-    environment {
-        DIRECTORY_PATH = '/OneDrive/SIT753'
-        TESTING_ENVIRONMENT = 'test'
-        PRODUCTION_ENVIRONMENT = 'marion' 
-    }
     stages {
-        stage('Build') {
-            steps {
-                echo "Building the application using Maven"
-                echo "Fetching the source code from ${env.DIRECTORY_PATH}"
-                echo "Compiling the code and generate any necessary artifacts."
+        stage('Build') { 
+            steps { 
+                echo "Use a build automation tool- Maven to compile and package the code."
             }
-        }
+            
+            post {
+                success {
+                    mail to: "marionmundara@gmail.com",
+                    subject: "The build status",
+                    body: "build status is a success!"
+                }
+            }
+        } // Close stage('Build')
+
         stage('Unit and Integration Tests') {
-            steps {
-                echo "Running unit tests using JUnit"
-                echo "Running integration tests using Selenium"
+            steps { 
+                echo " Use test automation tool- Junit for unit tests and integration test purposes."
             }
-        }
+        } // Close stage('Unit and Integration Tests')
+
         stage('Code Analysis') {
-            steps {
-                echo "Analyzing the code quality using SonarQube"
+            steps { 
+                echo " Integrate a code analysis tool- SonarQube."
             }
-        }
+        } // Close stage('Code Analysis')
+
         stage('Security Scan') {
-            steps {
-                echo "Performing security scan using OWASP Dependency-Check"
+            steps { 
+                echo " Perform a security scan using a tool- OWASP ZAP."
             }
-        }
+        } // Close stage('Security Scan')
+
         stage('Deploy to Staging') {
-            steps {
-                echo "Deploying the application to the staging server (e.g., AWS EC2 instance)"
+            steps { 
+                echo "Deploy the application to a staging server using deployment tool-  Docker."
             }
-        }
+        } // Close stage('Deploy to Staging')
+
         stage('Integration Tests on Staging') {
-            steps {
-                echo "Running integration tests on the staging environment"
+            steps { 
+                echo "Run integration tests on the staging environment."
             }
-        }
+        } // Close stage('Integration Tests on Staging')
+
         stage('Deploy to Production') {
-            steps {
-                echo "Deploying the application to the production server (e.g., AWS EC2 instance)"
+            steps { 
+                echo " Deploy the application to a production server using deployment tool- Docker."
             }
-        }
-    }
-    post {
-        success {
-            emailext subject: 'Pipeline Success',
-                      body: 'The pipeline has completed successfully',
-                      to: 'marionmundara@gmail.com',
-                      attachLog: true
-        }
-        failure {
-            emailext subject: 'Pipeline Failure',
-                      body: 'The pipeline has failed',
-                      to: 'marionmundara@gmail.com',
-                      attachLog: true
-        }
-    }
-}
+        } // Close stage('Deploy to Production')
+
+    } // Close stages
+} // Close pipeline
