@@ -18,6 +18,7 @@ pipeline {
                       body: "Pipeline Failed"
                 } 
             }
+        }
 
         stage('Unit and Integration Tests') {
             steps { 
