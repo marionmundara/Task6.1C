@@ -9,13 +9,15 @@ pipeline {
             post {
                 success {
                     mail to: "marionmundara@gmail.com",
-                    subject: "Status",
-                    body: "Pipeline Success!"
+                    subject: "Build Stage Success",
+                    body: "Pipeline Build Stage was successful!"
+                    attachmentsPattern: 'http://localhost:8080/job/task%206.1/12/console'
                 }
-               failure {
-                      mail to: 'marionmundara@gmail.com',
-                      subject: "Status",
-                      body: "Pipeline Failed"
+                failure {
+                    mail to: 'marionmundara@gmail.com',
+                    subject: "Build Stage Failed",
+                    body: "Pipeline Build Stage has failed. Please check the attached logs.",
+                    attachmentsPattern: 'http://localhost:8080/job/task%206.1/12/console'
                 } 
             }
         }
@@ -23,6 +25,20 @@ pipeline {
         stage('Unit and Integration Tests') {
             steps { 
                 echo " Use test automation tool- Junit for unit tests and integration test purposes."
+            }
+            post {
+                success {
+                    mail to: "marionmundara@gmail.com",
+                    subject: "Tests Stage Success",
+                    body: "Pipeline Test Stage was successful!"
+                    attachmentsPattern: 'http://localhost:8080/job/task%206.1/12/console'
+                }
+                failure {
+                    mail to: 'marionmundara@gmail.com',
+                    subject: "Tests Stage Failed",
+                    body: "Pipeline Test Stage has failed. Please check the attached logs.",
+                    attachmentsPattern: 'http://localhost:8080/job/task%206.1/12/console'
+                } 
             }
         } 
 
@@ -36,10 +52,24 @@ pipeline {
             steps { 
                 echo " Perform a security scan using a tool- OWASP Dependency-Check."
             }
+            post {
+                success {
+                    mail to: "marionmundara@gmail.com",
+                    subject: "Security Scan Stage Success",
+                    body: "Pipeline Security Scan Stage was successful!"
+                    attachmentsPattern: 'http://localhost:8080/job/task%206.1/12/console'
+                }
+                failure {
+                    mail to: 'marionmundara@gmail.com',
+                    subject: "Security Scan Stage Failed",
+                    body: "Pipeline Security Scan Stage has failed. Please check the attached logs.",
+                    attachmentsPattern: 'http://localhost:8080/job/task%206.1/12/console'
+                } 
+            }
         }
         stage('Deploy to Staging') {
             steps { 
-                echo "Deploy the application to a staging server using deployment tool-  Docker."
+                echo "Deploy the application to a staging server using deployment tool- Docker."
             }
         } 
 
@@ -54,6 +84,5 @@ pipeline {
                 echo " Deploy the application to a production server using deployment tool- Docker."
             }
         }
-
-    } 
-} 
+    }
+}
