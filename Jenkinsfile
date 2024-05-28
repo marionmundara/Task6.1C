@@ -10,12 +10,14 @@ pipeline {
                 success {
                     mail to: "marionmundara@gmail.com",
                     subject: "Status",
-                    body: "Pipeline Success!"
+                    body: "Pipeline Success!",
+                    attachLog: manager.build.logFile.text
                 }
                failure {
                       mail to: 'marionmundara@gmail.com',
                       subject: "Status",
-                      body: "Pipeline Failed"
+                      body: "Pipeline Failed",
+                    attachLog: manager.build.logFile.text
                 } 
             }
         }
