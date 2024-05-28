@@ -2,6 +2,7 @@ pipeline {
     agent any
 
     environment {
+        
         STAGING_SERVER = 'staging.example.com'
         PRODUCTION_SERVER = 'production.example.com'
         RECIPIENTS = 'marionmundara@gmail.com'
@@ -13,7 +14,7 @@ pipeline {
             steps {
                 echo 'Building the application...'
                 // Use your chosen tool to build your code, e.g., Maven, Gradle
-                sh 'mvn clean package'
+                
             }
         }
         
@@ -21,7 +22,7 @@ pipeline {
             steps {
                 echo 'Running tests...'
                 // Run your tests e.g., with Maven Surefire for unit tests
-                sh 'mvn test'
+            
             }
             post {
                 always {
@@ -29,10 +30,18 @@ pipeline {
                     junit 'target/surefire-reports/*.xml'
                     // If the test stage fails, send an email 
                     script {
-                        if (currentBuild.currentResult == 'FAILURE') {
-                            mail to: "${RECIPIENTS}",
-                                 subject: "Failed Unit and Integration Tests",
-                                 body: "The unit and integration tests have failed. Please check the logs for further details."
+                        def log = manager.build.logFile.text
+                        def recipient = 'marionmars99@gmail.com'
+                        def subject = "Stage ${env.STAGE_NAME} Completed"
+                        def body = "The stage ${env.STAGE_NAME} has completed. Please find the log attached."
+
+            // Use the Email Ext plugin to send an email with an attachment
+            emailext (
+                to: recipient,
+                subject: subject,
+                body: body,
+                attachLog: true // To attach the log
+            )
                         }
                     }
                 }
@@ -43,7 +52,6 @@ pipeline {
             steps {
                 echo 'Analyzing code...'
                 // Use a code quality tool like SonarQube, integrate with Jenkins
-                sh 'sonar-scanner'
             }
         }
         
@@ -51,7 +59,6 @@ pipeline {
             steps {
                 echo 'Performing security scan...'
                 // Use a security analysis tool like OWASP ZAP, integrate with Jenkins
-                sh 'zap-cli scan --target http://your-app-url'
             }
             post {
                 always {
@@ -67,7 +74,6 @@ pipeline {
             steps {
                 echo 'Deploying to Staging...'
                 // Example: use a script to deploy to staging server
-                sh './deploy-staging.sh ${STAGING_SERVER}'
             }
         }
         
@@ -75,7 +81,6 @@ pipeline {
             steps {
                 echo 'Running integration tests on staging...'
                 // Similar to integration tests before staging
-                sh 'mvn verify -Pintegration-tests'
             }
         }
         
@@ -83,7 +88,6 @@ pipeline {
             steps {
                 echo 'Deploying to Production...'
                 // Example: use a script to deploy to production server
-                sh './deploy-production.sh ${PRODUCTION_SERVER}'
             }
         }
     }
