@@ -1,88 +1,98 @@
 pipeline {
     agent any
+
+    environment {
+        STAGING_SERVER = 'staging.example.com'
+        PRODUCTION_SERVER = 'production.example.com'
+        RECIPIENTS = 'marionmundara@gmail.com'
+        // Add more variables as required
+    }
+
     stages {
-        stage('Build') { 
-            steps { 
-                echo "Use a build automation tool- Gradle to compile and package the code."
-            }
-            
-            post {
-                success {
-                    mail to: "marionmundara@gmail.com",
-                    subject: "Build Stage Success",
-                    body: "Pipeline Build Stage was successful!",
-                    attachmentsPattern: 'logs/build/*.log'
-                }
-                failure {
-                    mail to: 'marionmundara@gmail.com',
-                    subject: "Build Stage Failed",
-                    body: "Pipeline Build Stage has failed. Please check the attached logs.",
-                    attachmentsPattern: 'logs/build/*.log'
-                } 
+        stage('Build') {
+            steps {
+                echo 'Building the application...'
+                // Use your chosen tool to build your code, e.g., Maven, Gradle
+                sh 'mvn clean package'
             }
         }
-
+        
         stage('Unit and Integration Tests') {
-            steps { 
-                echo " Use test automation tool- Junit for unit tests and integration test purposes."
+            steps {
+                echo 'Running tests...'
+                // Run your tests e.g., with Maven Surefire for unit tests
+                sh 'mvn test'
             }
             post {
-                success {
-                    mail to: "marionmundara@gmail.com",
-                    subject: "Tests Stage Success",
-                    body: "Pipeline Test Stage was successful!",
-                    attachmentsPattern: 'logs/test/*.log'
+                always {
+                    // Assuming JUnit plugin is being used
+                    junit 'target/surefire-reports/*.xml'
+                    // If the test stage fails, send an email 
+                    script {
+                        if (currentBuild.currentResult == 'FAILURE') {
+                            mail to: "${RECIPIENTS}",
+                                 subject: "Failed Unit and Integration Tests",
+                                 body: "The unit and integration tests have failed. Please check the logs for further details."
+                        }
+                    }
                 }
-                failure {
-                    mail to: 'marionmundara@gmail.com',
-                    subject: "Tests Stage Failed",
-                    body: "Pipeline Test Stage has failed. Please check the attached logs.",
-                    attachmentsPattern: 'logs/test/*.log'
-                } 
             }
-        } 
-
+        }
+        
         stage('Code Analysis') {
-            steps { 
-                echo " Integrate a code analysis tool- SonarQube."
+            steps {
+                echo 'Analyzing code...'
+                // Use a code quality tool like SonarQube, integrate with Jenkins
+                sh 'sonar-scanner'
             }
         }
-
+        
         stage('Security Scan') {
-            steps { 
-                echo " Perform a security scan using a tool- OWASP Dependency-Check."
+            steps {
+                echo 'Performing security scan...'
+                // Use a security analysis tool like OWASP ZAP, integrate with Jenkins
+                sh 'zap-cli scan --target http://your-app-url'
             }
             post {
-                success {
-                    mail to: "marionmundara@gmail.com",
-                    subject: "Security Scan Stage Success",
-                    body: "Pipeline Security Scan Stage was successful!",
-                    attachmentsPattern: 'logs/security_scan/*.log'
+                always {
+                    // Send email after security scan
+                    mail to: "${RECIPIENTS}",
+                         subject: "Security Scan Completed",
+                         body: "The security scan has been completed. Please check the reports for further details."
                 }
-                failure {
-                    mail to: 'marionmundara@gmail.com',
-                    subject: "Security Scan Stage Failed",
-                    body: "Pipeline Security Scan Stage has failed. Please check the attached logs.",
-                    attachmentsPattern: 'logs/security_scan/*.log'
-                } 
             }
         }
+        
         stage('Deploy to Staging') {
-            steps { 
-                echo "Deploy the application to a staging server using deployment tool- Docker."
-            }
-        } 
-
-        stage('Integration Tests on Staging') {
-            steps { 
-                echo "Run integration tests on the staging environment."
+            steps {
+                echo 'Deploying to Staging...'
+                // Example: use a script to deploy to staging server
+                sh './deploy-staging.sh ${STAGING_SERVER}'
             }
         }
-
-        stage('Deploy to Production') {
-            steps { 
-                echo " Deploy the application to a production server using deployment tool- Docker."
+        
+        stage('Integration Tests on Staging') {
+            steps {
+                echo 'Running integration tests on staging...'
+                // Similar to integration tests before staging
+                sh 'mvn verify -Pintegration-tests'
             }
+        }
+        
+        stage('Deploy to Production') {
+            steps {
+                echo 'Deploying to Production...'
+                // Example: use a script to deploy to production server
+                sh './deploy-production.sh ${PRODUCTION_SERVER}'
+            }
+        }
+    }
+    
+    post {
+        failure {
+            mail to: "${RECIPIENTS}",
+                 subject: "Pipeline Failed",
+                 body: "The pipeline execution has failed. Please check Jenkins for details."
         }
     }
 }
