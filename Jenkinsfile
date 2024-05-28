@@ -10,14 +10,14 @@ pipeline {
                 success {
                     mail to: "marionmundara@gmail.com",
                     subject: "Build Stage Success",
-                    body: "Pipeline Build Stage was successful!"
-                    attachmentsPattern: 'http://localhost:8080/job/task%206.1/12/console'
+                    body: "Pipeline Build Stage was successful!",
+                    attachmentsPattern: 'logs/build/*.log'
                 }
                 failure {
                     mail to: 'marionmundara@gmail.com',
                     subject: "Build Stage Failed",
                     body: "Pipeline Build Stage has failed. Please check the attached logs.",
-                    attachmentsPattern: 'http://localhost:8080/job/task%206.1/12/console'
+                    attachmentsPattern: 'logs/build/*.log'
                 } 
             }
         }
@@ -30,14 +30,14 @@ pipeline {
                 success {
                     mail to: "marionmundara@gmail.com",
                     subject: "Tests Stage Success",
-                    body: "Pipeline Test Stage was successful!"
-                    attachmentsPattern: 'http://localhost:8080/job/task%206.1/12/console'
+                    body: "Pipeline Test Stage was successful!",
+                    attachmentsPattern: 'logs/test/*.log'
                 }
                 failure {
                     mail to: 'marionmundara@gmail.com',
                     subject: "Tests Stage Failed",
                     body: "Pipeline Test Stage has failed. Please check the attached logs.",
-                    attachmentsPattern: 'http://localhost:8080/job/task%206.1/12/console'
+                    attachmentsPattern: 'logs/test/*.log'
                 } 
             }
         } 
@@ -56,14 +56,14 @@ pipeline {
                 success {
                     mail to: "marionmundara@gmail.com",
                     subject: "Security Scan Stage Success",
-                    body: "Pipeline Security Scan Stage was successful!"
-                    attachmentsPattern: 'http://localhost:8080/job/task%206.1/12/console'
+                    body: "Pipeline Security Scan Stage was successful!",
+                    attachmentsPattern: 'logs/security_scan/*.log'
                 }
                 failure {
                     mail to: 'marionmundara@gmail.com',
                     subject: "Security Scan Stage Failed",
                     body: "Pipeline Security Scan Stage has failed. Please check the attached logs.",
-                    attachmentsPattern: 'http://localhost:8080/job/task%206.1/12/console'
+                    attachmentsPattern: 'logs/security_scan/*.log'
                 } 
             }
         }
