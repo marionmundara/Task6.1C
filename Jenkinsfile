@@ -17,7 +17,7 @@ pipeline {
                       emailext to: 'marionmundara@gmail.com',
                       subject: "Status",
                       body: "Pipeline Failed",
-                    attachLog: true
+                      attachLog: true
                 } 
             }
         }
